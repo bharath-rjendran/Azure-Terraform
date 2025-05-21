@@ -1,8 +1,8 @@
 provider "azurerm" {
-  subscription_id = "4f0063ab-721d-4e50-b826-0fdb9627022e"
-  client_id       = "9066e710-7b1a-4e3c-b98c-15b0ad4ba857"
-  tenant_id       = "da8b9507-37d5-409e-b393-f85799d68ad3"
-  client_secret   = "dBt8Q~J3p_dG8Hck_gvBXycty5dVPbzTkUc1jaFm"
+  subscription_id = "67d51d48-5149-4869-8723-1725d5afded4"
+  client_id       = "444b7263-88fc-49a5-b681-d9a5c7e65816"
+  tenant_id       = "382589be-c5d1-4f38-98a4-67875a9d66e9"
+  client_secret   = "mm48Q~g~2vzvceeyrFwY~bqnNPNbvGFDpE92vc2i"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
