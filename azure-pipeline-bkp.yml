@@ -1,0 +1,80 @@
+trigger: 
+  branches:
+    include:
+      - develop
+      - main # Runs pipeline when a changes are pushed to develop or main
+pr:
+  branches:
+    include:
+      - develop
+      - main # Runs pipeline only when a PR is merged into these branches
+
+resources:
+  repositories:
+    - repository: self
+
+pool:
+  name: 'Self-Hosted-Agent'
+
+variables:
+  - group: TerraformSecrets
+    
+parameters:
+  - name: environment
+    displayName: "Select Environment"
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
+stages:
+  - stage: 'Deploy_${{ parameters.environment }}'
+    variables:
+      - group: 'Terraform-${{ parameters.environment }}'
+    jobs:
+      - job: 'Terraform_${{ parameters.environment }}'
+        steps:
+          - script: |
+              echo "Installing Azure CLI"
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: "Install Azure CLI"
+            
+          - task: AzureCLI@2
+            displayName: 'Azure Login'
+            inputs:
+              azureSubscription: 'sp_terraform'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az version  
+          
+          - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+            displayName: 'Replace Tokens in ${{ parameters.environment }}.tfvars'
+            inputs:
+              rootDirectory: '$(Build.SourcesDirectory)/environments/'
+              targetFiles: '${{ parameters.environment }}.tfvars'
+              tokenPattern: 'hash'
+              verbosity: 'detailed'
+              tokenPrefix: '#{'
+              tokenSuffix: '}#'
+              encoding: 'utf-8'
+
+          - script: |
+              echo "setting up backend configuration for ${{ parameters.environment }}"
+              export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+              export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+              export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
+              export ARM_TENANT_ID=$(ARM_TENANT_ID)
+              terraform init -reconfigure -backend-config=backend/backend-${{ parameters.environment }}.tfbackend
+            displayName: 'Terraform Init'
+          
+          - script: |
+              echo "Planning Terraform Deployment for ${{ parameters.environment }}"
+              terraform plan -var-file=environments/${{ parameters.environment }}.tfvars
+            displayName: 'Terraform Plan'
+          
+          - script: |
+              echo "Applying Terraform Deployment for ${{ parameters.environment }}"
+              terraform apply -var-file=environments/${{ parameters.environment }}.tfvars -auto-approve
+            displayName: 'Terraform Apply'
