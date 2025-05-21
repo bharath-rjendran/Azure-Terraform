@@ -15,7 +15,7 @@ on:
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
-    environment: ${{ steps.setenv.outputs.env }}
+    environment: ${{ github.event.inputs.environment || 'test' }}
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -55,7 +55,7 @@ jobs:
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: 'environments/${{ github.event.inputs.environment || steps.setenv.outputs.env }}.tfvars'
+          files: environments/${{ github.event.inputs.environment || 'test' }}.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -81,10 +81,10 @@ jobs:
 
 
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="backend/backend-${{ github.event.inputs.environment || steps.setenv.outputs.env }}.tfbackend"
+        run: terraform init -reconfigure -backend-config="backend/backend-${{ github.event.inputs.environment || 'test' }}.tfbackend"
 
       - name: Terraform Plan
-        run: terraform plan -var-file="environments/${{ github.event.inputs.environment || steps.setenv.outputs.env }}.tfvars"
+        run: terraform plan -var-file="environments/${{ github.event.inputs.environment || 'test' }}.tfvars"
 
       - name: Terraform Apply
-        run: terraform apply -var-file="environments/${{ github.event.inputs.environment || steps.setenv.outputs.env }}.tfvars" -auto-approve
+        run: terraform apply -var-file="environments/${{ github.event.inputs.environment || 'test' }}.tfvars" -auto-approve
