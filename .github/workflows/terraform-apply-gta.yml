@@ -10,7 +10,7 @@ on:
       environment:
         description: 'Select environment to apply'
         required: false
-        default: ''
+        default: 'test'
 
 jobs:
   terraform-apply:
