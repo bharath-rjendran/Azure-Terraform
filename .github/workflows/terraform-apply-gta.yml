@@ -5,7 +5,7 @@ on:
     branches:
       - develop
       - main
-      - feature/*
+      - featur/*
   workflow_dispatch:
     inputs:
       environment:
@@ -16,6 +16,7 @@ on:
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'test' }}
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -44,20 +45,21 @@ jobs:
             az account show
 
       - name: Set Environment from Branch
+        id: setenv
         run: |
           BRANCH="${GITHUB_REF##*/}"
           if [[ "$BRANCH" == "main" ]]; then
-            echo "ENV=prod" >> $GITHUB_ENV
+            echo "env=prod" >> $GITHUB_OUTPUT
           elif [[ "$BRANCH" == "develop" ]]; then
-            echo "ENV=dev" >> $GITHUB_ENV
+            echo "env=dev" >> $GITHUB_OUTPUT
           else
-            echo "ENV=test" >> $GITHUB_ENV
+            echo "env=test" >> $GITHUB_OUTPUT
           fi
 
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: environments/${{ env.ENV }}.tfvars
+          files: environments/${{ github.event.inputs.environment || 'test' }}.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -83,10 +85,10 @@ jobs:
 
 
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
+        run: terraform init -reconfigure -backend-config="backend/backend-${{ github.event.inputs.environment || 'test' }}.tfbackend"
 
       - name: Terraform Plan
-        run: terraform plan -var-file="environments/${{ env.ENV }}.tfvars"
+        run: terraform plan -var-file="environments/${{ github.event.inputs.environment || 'test' }}.tfvars"
 
       - name: Terraform Apply
-        run: terraform apply -var-file="environments/${{ env.ENV }}.tfvars" -auto-approve
+        run: terraform apply -var-file="environments/${{ github.event.inputs.environment || 'test' }}.tfvars" -auto-approve
