@@ -65,13 +65,13 @@ jobs:
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: environments/${{ env.ENV }}.tfvars
+          files: environments/$ENV.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
           app_location: ${{ secrets.APP_LOCATION }}
           db_location: ${{ secrets.DB_LOCATION }}
-          msg_location: ${{ secrets.MSG_LOCATION }}
+          msg_location : ${{ secrets.MSG_LOCATION }}
           sm_location: ${{ secrets.SM_LOCATION }}
           aks_location: ${{ secrets.AKS_LOCATION }}
           location: ${{ secrets.LOCATION }}
@@ -92,7 +92,7 @@ jobs:
       - name: Show rendered tfvars file
         run: |
           echo "----- ${ENV} environment tfvars -----"
-          cat environments/${{ env.ENV }}.tfvars
+          cat environments/${ENV}.tfvars
 
       - name: Terraform Init
         run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
