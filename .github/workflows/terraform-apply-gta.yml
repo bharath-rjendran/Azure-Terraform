@@ -60,11 +60,15 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az account show
+            
+      - name: Copy correct tfvars file
+        run: |
+          cp environments/${{ steps.setenv.outputs.env }}.tfvars selected.tfvars
 
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: environments/${{ steps.setenv.outputs.env }}.tfvars
+          files: selected.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -92,7 +96,7 @@ jobs:
         run: terraform init -reconfigure -backend-config="backend/backend-${{ steps.setenv.outputs.env }}.tfbackend"
 
       - name: Terraform Plan
-        run: terraform plan -var-file="environments/${{ steps.setenv.outputs.env }}.tfvars"
+        run: terraform plan -var-file="selected.tfvars.tfvars"
 
       - name: Terraform Apply
-        run: terraform apply -var-file="environments/${{ steps.setenv.outputs.env }}.tfvars" -auto-approve
+        run: terraform apply -var-file="selected.tfvars" -auto-approve
