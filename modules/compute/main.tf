@@ -41,7 +41,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   name                = "aks-${var.environment}"
   location            = var.aks_location
   resource_group_name = var.resource_group_name
-  dns_prefix = "${replace("aks${lower(trimspace(var.environment))}", "-", "")}"
+  dns_prefix = var.environment
   kubernetes_version = "1.29.2"
 
   default_node_pool {
@@ -63,7 +63,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 #App Services
 
 resource "azurerm_linux_web_app" "app_service" {
-  name                = "app-service-01-${var.environment}"
+  name                = "app-service-${var.environment}"
   location            = var.app_location
   resource_group_name = var.resource_group_name
   service_plan_id = azurerm_service_plan.app_service_plan.id
