@@ -60,7 +60,7 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az account show
-            
+
       - name: Copy correct tfvars file
         run: |
           cp environments/${{ steps.setenv.outputs.env }}.tfvars selected.tfvars
@@ -96,7 +96,7 @@ jobs:
         run: terraform init -reconfigure -backend-config="backend/backend-${{ steps.setenv.outputs.env }}.tfbackend"
 
       - name: Terraform Plan
-        run: terraform plan -var-file="selected.tfvars.tfvars"
+        run: terraform plan -var-file="selected.tfvars"
 
       - name: Terraform Apply
         run: terraform apply -var-file="selected.tfvars" -auto-approve
