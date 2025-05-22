@@ -62,27 +62,27 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
 #App Services
 
-resource "azurerm_linux_web_app" "app_service" {
-  name                = "app-service-${var.environment}"
-  #name                = "app-service-poc"
-  location            = var.app_location
-  resource_group_name = var.resource_group_name
-  service_plan_id = azurerm_service_plan.app_service_plan.id
-  https_only      = true
+# resource "azurerm_linux_web_app" "app_service" {
+#   name                = "app-service-${var.environment}"
+#   #name                = "app-service-poc"
+#   location            = var.app_location
+#   resource_group_name = var.resource_group_name
+#   service_plan_id = azurerm_service_plan.app_service_plan.id
+#   https_only      = true
 
-  site_config {
-    always_on = false
-  }
+#   site_config {
+#     always_on = false
+#   }
 
-  tags = {
-    Environment = var.environment
-  }
-}
+#   tags = {
+#     Environment = var.environment
+#   }
+# }
 
-resource "azurerm_service_plan" "app_service_plan" {
-  name                = "app-service-plan-${var.environment}"
-  location            = var.app_location
-  resource_group_name = var.resource_group_name
-  sku_name = "F1"
-  os_type  = "Linux"
-}
+# resource "azurerm_service_plan" "app_service_plan" {
+#   name                = "app-service-plan-${var.environment}"
+#   location            = var.app_location
+#   resource_group_name = var.resource_group_name
+#   sku_name = "F1"
+#   os_type  = "Linux"
+# }
