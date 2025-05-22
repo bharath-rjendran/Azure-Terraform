@@ -16,6 +16,7 @@ on:
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'prod' || github.ref_name == 'develop' && 'dev' || 'test') }}
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -65,7 +66,7 @@ jobs:
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: environments/$ENV.tfvars
+          files: environments/${{ env.ENV }}.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -92,7 +93,7 @@ jobs:
       - name: Show rendered tfvars file
         run: |
           echo "----- ${ENV} environment tfvars -----"
-          cat environments/${ENV}.tfvars
+          cat environments/${{ env.ENV }}.tfvars
 
       - name: Terraform Init
         run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
