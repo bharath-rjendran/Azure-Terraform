@@ -1,4 +1,4 @@
-name: terraform-apply
+name: terraform-apply-POC-1
 
 on:
   push:
@@ -83,6 +83,11 @@ jobs:
           vm_size: ${{ secrets.VM_SIZE }}
           address_space: ${{ secrets.ADDRESS_SPACE }}
 
+      - name: Show rendered tfvars file
+        run: |
+          echo "----- ${ENV} environment tfvars -----"
+          cat environments/${{ github.event.inputs.environment || 'test' }}.tfvars
+      
 
       - name: Terraform Init
         run: terraform init -reconfigure -backend-config="backend/backend-${{ github.event.inputs.environment || 'test' }}.tfbackend"
