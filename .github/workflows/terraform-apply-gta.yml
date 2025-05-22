@@ -61,7 +61,7 @@ jobs:
 
       - name: Print selected environment
         run: | 
-          echo "Selected environment: $ENV"
+          echo "Selected environment: ${{ env.ENV }}"
       
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
