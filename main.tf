@@ -41,23 +41,23 @@ module "compute" {
   app_location = var.app_location
 }
 
-# module "storage" {
-#   depends_on          = [module.resource_group]
-#   source              = "./modules/storage"
-#   resource_group_name = var.resource_group_name
-#   location            = var.location
-#   environment = var.environment
-# }
+module "storage" {
+  depends_on          = [module.resource_group]
+  source              = "./modules/storage"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  environment = var.environment
+}
 
-# module "database" {
-#   depends_on = [ module.resource_group ]
-#   source             = "./modules/database"
-#   resource_group_name = var.resource_group_name
-#   db_location = var.db_location
-#   environment = var.environment
-#   sql_admin_username = var.admin_username
-#   sql_admin_password = var.sql_admin_password
-# }
+module "database" {
+  depends_on = [ module.resource_group ]
+  source             = "./modules/database"
+  resource_group_name = var.resource_group_name
+  db_location = var.db_location
+  environment = var.environment
+  sql_admin_username = var.admin_username
+  sql_admin_password = var.sql_admin_password
+}
 
 # module "security_monitoring" {
 #   depends_on = [ module.resource_group ]
