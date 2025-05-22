@@ -11,7 +11,7 @@ on:
       environment:
         description: 'Select environment to apply'
         required: false
-        default: ''
+        default: 'test'
 
 jobs:
   terraform-apply:
@@ -28,20 +28,22 @@ jobs:
       - name: Set Environment from Branch or Input
         id: setenv
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.environment }}" ]]; then
-            echo "env=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.environment }}" != "" ]]; then
+            echo "ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           else
-            BRANCH="${GITHUB_REF#refs/heads/}"
+            BRANCH="${GITHUB_REF##*/}"
             if [[ "$BRANCH" == "main" ]]; then
-              echo "env=prod" >> $GITHUB_OUTPUT
+              echo "ENV=prod" >> $GITHUB_ENV
             elif [[ "$BRANCH" == "develop" ]]; then
-              echo "env=dev" >> $GITHUB_OUTPUT
+              echo "ENV=dev" >> $GITHUB_ENV
             else
-              echo "env=test" >> $GITHUB_OUTPUT
+              echo "ENV=test" >> $GITHUB_ENV
             fi
           fi
-      - name: Debug - Print Environment
-        run: echo "ENV = ${{ steps.setenv.outputs.env }}"
+
+      - name: Print selected environment
+        run: | 
+          echo "Selected environment: $ENV"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -61,14 +63,11 @@ jobs:
           inlineScript: |
             az account show
 
-      - name: Copy correct tfvars file
-        run: |
-          cp environments/${{ steps.setenv.outputs.env }}.tfvars selected.tfvars
 
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: selected.tfvars
+          files: environments/${{ env.ENV }}.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -93,10 +92,10 @@ jobs:
           address_space: ${{ secrets.ADDRESS_SPACE }}
 
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="backend/backend-${{ steps.setenv.outputs.env }}.tfbackend"
+        run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
 
       - name: Terraform Plan
-        run: terraform plan -var-file="selected.tfvars"
+        run: terraform plan -var-file="environments/${{ env.ENV }}.tfvars"
 
       - name: Terraform Apply
-        run: terraform apply -var-file="selected.tfvars" -auto-approve
+        run: terraform apply -var-file="environments/${{ env.ENV }}.tfvars" -auto-approve
