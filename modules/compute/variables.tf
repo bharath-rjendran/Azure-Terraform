@@ -26,7 +26,9 @@ variable "subnet_id" {
     description = "The ID of the subnet in which to create the virtual machine"
     type        = string
 }
-variable "environment" {}
+variable "environment" {
+  type    = string
+}
 variable "client_id" {}
 variable "client_secret" {}
 variable "aks_location" {}
