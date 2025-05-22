@@ -1,4 +1,4 @@
-name: terraform-apply-Azure-Resources
+name: terraform-apply
 
 on:
   push:
@@ -11,32 +11,21 @@ on:
       environment:
         description: 'Select environment to apply'
         required: false
-        default: ''
+        default: 'test'
 
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'test' }}
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set Environment from Branch or Input
-        id: setenv
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.environment }}" ]]; then
-            echo "env=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
-          else
-            BRANCH="${GITHUB_REF#refs/heads/}"
-            if [[ "$BRANCH" == "main" ]]; then
-              echo "env=prod" >> $GITHUB_OUTPUT
-            elif [[ "$BRANCH" == "develop" ]]; then
-              echo "env=dev" >> $GITHUB_OUTPUT
-            else
-              echo "env=test" >> $GITHUB_OUTPUT
-            fi
-          fi
-      - name: Debug - Print Environment
-        run: echo "ENV = ${{ steps.setenv.outputs.env }}"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -48,7 +37,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       
-
       - name: Azure CLI script
         uses: azure/cli@v2
         with:
@@ -56,10 +44,22 @@ jobs:
           inlineScript: |
             az account show
 
+      - name: Set Environment from Branch
+        id: setenv
+        run: |
+          BRANCH="${GITHUB_REF##*/}"
+          if [[ "$BRANCH" == "main" ]]; then
+            echo "env=prod" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH" == "develop" ]]; then
+            echo "env=dev" >> $GITHUB_OUTPUT
+          else
+            echo "env=test" >> $GITHUB_OUTPUT
+          fi
+
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: environments/${{ steps.setenv.outputs.env }}.tfvars
+          files: environments/${{ github.event.inputs.environment || 'test' }}.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -83,11 +83,12 @@ jobs:
           vm_size: ${{ secrets.VM_SIZE }}
           address_space: ${{ secrets.ADDRESS_SPACE }}
 
+
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="backend/backend-${{ steps.setenv.outputs.env }}.tfbackend"
+        run: terraform init -reconfigure -backend-config="backend/backend-${{ github.event.inputs.environment || 'test' }}.tfbackend"
 
       - name: Terraform Plan
-        run: terraform plan -var-file="environments/${{ steps.setenv.outputs.env }}.tfvars"
+        run: terraform plan -var-file="environments/${{ github.event.inputs.environment || 'test' }}.tfvars"
 
       - name: Terraform Apply
-        run: terraform apply -var-file="environments/${{ steps.setenv.outputs.env }}.tfvars" -auto-approve
+        run: terraform apply -var-file="environments/${{ github.event.inputs.environment || 'test' }}.tfvars" -auto-approve
