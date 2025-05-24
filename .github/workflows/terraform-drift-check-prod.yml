@@ -15,7 +15,7 @@ env:
 jobs:
   drift-detection:
     runs-on: ubuntu-latest
-    environment: ${{ env.ENV }}
+    environment: prod
 
     steps:
       - name: Checkout code
