@@ -65,13 +65,14 @@ jobs:
         id: tf_plan
         run: |
           terraform plan -detailed-exitcode -var-file="environments/${{ env.ENV }}.tfvars"
-          echo "exitcode=$?" >> $GITHUB_OUTPUT
+          echo "::set-output name=exitcode::$?"
         continue-on-error: true
 
       - name: Evaluate Drift Status
         run: |
-          if [ "${{ steps.tf_plan.outputs.exitcode }}" == "2" ]; then
-            echo "🔍 Drift detected in ${{ env.ENV }} environment!"
+          echo "exit code is: ${{ steps.tf_plan.outputs.exitcode }}"
+          if [[ "${{ steps.tf_plan.outputs.exitcode }}" == "2" ]]; then
+            echo "🟡 Drift detected in ${{ env.ENV }} environment!"
             exit 1
           else
             echo "✅ No drift detected."
