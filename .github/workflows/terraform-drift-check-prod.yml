@@ -34,7 +34,7 @@ jobs:
       - name: Replace Tokens in tfvars
         uses: cschleiden/replace-tokens@v1
         with:
-          files: environments/${ENV}.tfvars
+          files: environments/${{ env.ENV }}.tfvars
         env:
           admin_username: ${{ secrets.ADMIN_USERNAME }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -59,18 +59,18 @@ jobs:
           address_space: ${{ secrets.ADDRESS_SPACE }}
 
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="backend/backend-${ENV}.tfbackend"
+        run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
 
       - name: Terraform Plan (Detect Drift)
         id: tf_plan
         run: |
-          terraform plan -detailed-exitcode -var-file="environments/${ENV}.tfvars"
+          terraform plan -detailed-exitcode -var-file="environments/${{ env.ENV }}.tfvars"
         continue-on-error: true
 
       - name: Evaluate Drift Status
         run: |
-          if [[ "${{ steps.tf_plan.outputs.exitcode }}" == "2" ]]; then
-            echo "🔍 Drift detected in ${ENV} environment!"
+          if [[ "${{ steps.tf_plan.outcome }}" == "failure" ]]; then
+            echo "🔍 Drift detected in${{ env.ENV }} environment!"
             exit 1
           else
             echo "✅ No drift detected."
