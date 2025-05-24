@@ -52,6 +52,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     max_surge                     = "10%"
     drain_timeout_in_minutes      = 0
     node_soak_duration_in_minutes = 0
+    }
   }
   service_principal {
     client_id     = var.client_id
