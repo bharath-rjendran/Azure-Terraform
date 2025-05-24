@@ -1,4 +1,4 @@
-name: Terraform Drift Detection - Prod
+name: Terraform Drift Detection - Test
 
 on:
   schedule:
