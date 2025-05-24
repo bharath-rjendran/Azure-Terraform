@@ -72,7 +72,7 @@ jobs:
         run: |
           echo "exit code is: ${{ steps.tf_plan.outputs.exitcode }}"
           if [[ "${{ steps.tf_plan.outputs.exitcode }}" == "2" ]]; then
-            echo "🟡 Drift detected in ${{ env.ENV }} environment!"
+            echo "🟡 Drift detected in Azure Test Environment Resources!"
             exit 1
           else
             echo "✅ No drift detected."
