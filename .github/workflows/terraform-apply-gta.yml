@@ -5,14 +5,12 @@ on:
     branches:
       - develop
       - main
-      - feature/*
   workflow_dispatch:
     inputs:
       environment:
         description: 'Select environment to apply'
         required: false
         default: 'test'
-
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
