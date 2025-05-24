@@ -48,6 +48,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name       = "default"
     node_count = 1
     vm_size    = "standard_b2pls_v2"
+    upgrade_settings {
+    max_surge                     = "10%"
+    drain_timeout_in_minutes      = 0
+    node_soak_duration_in_minutes = 0
   }
   service_principal {
     client_id     = var.client_id
