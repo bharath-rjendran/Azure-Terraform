@@ -61,37 +61,37 @@ jobs:
         run: | 
           echo "Selected environment: ${{ env.ENV }}"
       
-      - name: Replace Tokens in tfvars
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: environments/${{ env.ENV }}.tfvars
-        env:
-          admin_username: ${{ secrets.ADMIN_USERNAME }}
-          admin_password: ${{ secrets.ADMIN_PASSWORD }}
-          app_location: ${{ secrets.APP_LOCATION }}
-          db_location: ${{ secrets.DB_LOCATION }}
-          msg_location : ${{ secrets.MSG_LOCATION }}
-          sm_location: ${{ secrets.SM_LOCATION }}
-          aks_location: ${{ secrets.AKS_LOCATION }}
-          location: ${{ secrets.LOCATION }}
-          resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
-          vm_name: ${{ secrets.VM_NAME }}
-          client_id: ${{ secrets.CLIENT_ID }}
-          client_secret: ${{ secrets.CLIENT_SECRET }}
-          environment: ${{ secrets.ENVIRONMENT }}
-          sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
-          sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
-          subnet_cidr_blocks: ${{ secrets.SUBNET_CIDR_BLOCKS }}
-          subnet_name: ${{ secrets.SUBNET_NAME }}
-          subnet_names: ${{ secrets.SUBNET_NAMES }}
-          tenant_id: ${{ secrets.TENANT_ID }}
-          vm_size: ${{ secrets.VM_SIZE }}
-          address_space: ${{ secrets.ADDRESS_SPACE }}
+      # - name: Replace Tokens in tfvars
+      #   uses: cschleiden/replace-tokens@v1
+      #   with:
+      #     files: environments/${{ env.ENV }}.tfvars
+      #   env:
+      #     admin_username: ${{ secrets.ADMIN_USERNAME }}
+      #     admin_password: ${{ secrets.ADMIN_PASSWORD }}
+      #     app_location: ${{ secrets.APP_LOCATION }}
+      #     db_location: ${{ secrets.DB_LOCATION }}
+      #     msg_location : ${{ secrets.MSG_LOCATION }}
+      #     sm_location: ${{ secrets.SM_LOCATION }}
+      #     aks_location: ${{ secrets.AKS_LOCATION }}
+      #     location: ${{ secrets.LOCATION }}
+      #     resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
+      #     vm_name: ${{ secrets.VM_NAME }}
+      #     client_id: ${{ secrets.CLIENT_ID }}
+      #     client_secret: ${{ secrets.CLIENT_SECRET }}
+      #     environment: ${{ secrets.ENVIRONMENT }}
+      #     sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
+      #     sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
+      #     subnet_cidr_blocks: ${{ secrets.SUBNET_CIDR_BLOCKS }}
+      #     subnet_name: ${{ secrets.SUBNET_NAME }}
+      #     subnet_names: ${{ secrets.SUBNET_NAMES }}
+      #     tenant_id: ${{ secrets.TENANT_ID }}
+      #     vm_size: ${{ secrets.VM_SIZE }}
+      #     address_space: ${{ secrets.ADDRESS_SPACE }}
 
-      - name: Show rendered tfvars file
-        run: |
-          echo "----- ${ENV} environment tfvars -----"
-          cat environments/${{ env.ENV }}.tfvars
+      # - name: Show rendered tfvars file
+      #   run: |
+      #     echo "----- ${ENV} environment tfvars -----"
+      #     cat environments/${{ env.ENV }}.tfvars
 
       - name: Terraform Init
         run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
