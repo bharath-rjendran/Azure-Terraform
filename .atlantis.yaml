@@ -1,71 +1,39 @@
 version: 3
+automerge: false
 projects:
   - name: dev
     dir: .
     workspace: dev
-    terraform_version: v1.5.7
     autoplan:
+      when_modified: ["*.tf", "modules/**/*.tf", "environments/dev.tfvars"]
       enabled: true
-      when_modified:
-        - "*.tf"
-        - "modules/**/*.tf"
-        - "environments/dev.tfvars"
-        - "backend/backend-dev.tfbackend"
-    workflow: dev
+    terraform_version: v1.5.7
+    workflow: custom
 
   - name: test
     dir: .
     workspace: test
-    terraform_version: v1.5.7
     autoplan:
+      when_modified: ["*.tf", "modules/**/*.tf", "environments/test.tfvars"]
       enabled: true
-      when_modified:
-        - "*.tf"
-        - "modules/**/*.tf"
-        - "environments/test.tfvars"
-        - "backend/backend-test.tfbackend"
-    workflow: test
+    terraform_version: v1.5.7
+    workflow: custom
 
   - name: prod
     dir: .
     workspace: prod
-    terraform_version: v1.5.7
     autoplan:
+      when_modified: ["*.tf", "modules/**/*.tf", "environments/prod.tfvars"]
       enabled: true
-      when_modified:
-        - "*.tf"
-        - "modules/**/*.tf"
-        - "environments/prod.tfvars"
-        - "backend/backend-prod.tfbackend"
-    workflow: prod
+    terraform_version: v1.5.7
+    workflow: custom
 
 workflows:
-  dev:
+  custom:
     plan:
       steps:
-        - init
-        - plan:
-            extra_args: ["-var-file=environments/dev.tfvars"]
+        - run: terraform init -backend-config="backend/backend-${ATLANTIS_WORKSPACE}.tfbackend"
+        - run: terraform plan -var-file="environments/${ATLANTIS_WORKSPACE}.tfvars" -out=plan.tfplan
     apply:
       steps:
-        - apply
-
-  test:
-    plan:
-      steps:
-        - init
-        - plan:
-            extra_args: ["-var-file=environments/test.tfvars"]
-    apply:
-      steps:
-        - apply
-
-  prod:
-    plan:
-      steps:
-        - init
-        - plan:
-            extra_args: ["-var-file=environments/prod.tfvars"]
-    apply:
-      steps:
-        - apply
+        - run: terraform apply plan.tfplan
