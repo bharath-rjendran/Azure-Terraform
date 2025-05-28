@@ -1,0 +1,71 @@
+version: 3
+projects:
+  - name: dev
+    dir: .
+    workspace: dev
+    terraform_version: v1.5.7
+    autoplan:
+      enabled: true
+      when_modified:
+        - "*.tf"
+        - "modules/**/*.tf"
+        - "environments/dev.tfvars"
+        - "backend/backend-dev.tfbackend"
+    workflow: dev
+
+  - name: test
+    dir: .
+    workspace: test
+    terraform_version: v1.5.7
+    autoplan:
+      enabled: true
+      when_modified:
+        - "*.tf"
+        - "modules/**/*.tf"
+        - "environments/test.tfvars"
+        - "backend/backend-test.tfbackend"
+    workflow: test
+
+  - name: prod
+    dir: .
+    workspace: prod
+    terraform_version: v1.5.7
+    autoplan:
+      enabled: true
+      when_modified:
+        - "*.tf"
+        - "modules/**/*.tf"
+        - "environments/prod.tfvars"
+        - "backend/backend-prod.tfbackend"
+    workflow: prod
+
+workflows:
+  dev:
+    plan:
+      steps:
+        - init
+        - plan:
+            extra_args: ["-var-file=environments/dev.tfvars"]
+    apply:
+      steps:
+        - apply
+
+  test:
+    plan:
+      steps:
+        - init
+        - plan:
+            extra_args: ["-var-file=environments/test.tfvars"]
+    apply:
+      steps:
+        - apply
+
+  prod:
+    plan:
+      steps:
+        - init
+        - plan:
+            extra_args: ["-var-file=environments/prod.tfvars"]
+    apply:
+      steps:
+        - apply
