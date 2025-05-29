@@ -60,12 +60,12 @@ jobs:
       #     address_space: ${{ secrets.ADDRESS_SPACE }}
 
       - name: Terraform Init
-        run: terraform init -reconfigure -backend-config="backend/backend-${{ env.ENV }}.tfbackend"
+        run: terraform init -reconfigure -backend-config="backend/backend-test.tfbackend"
 
       - name: Terraform Plan (Detect Drift)
         id: tf_plan
         run: |
-          terraform plan -detailed-exitcode -var-file="environments/${{ env.ENV }}.tfvars"
+          terraform plan -detailed-exitcode -var-file="environments/test.tfvars"
           echo "::set-output name=exitcode::$?"
         continue-on-error: true
 
