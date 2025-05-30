@@ -2,8 +2,8 @@ name: Terraform Drift Detection - Test
 
 on:
   schedule:
-    #- cron: '0 3 * * *' # Every day at 3 AM UTC
-    - cron: '*/5 * * * *' 
+    - cron: '0 3 * * *' # Every day at 3 AM UTC
+    #- cron: '*/5 * * * *' 
   workflow_dispatch:
 
 env:
