@@ -1,5 +1,5 @@
 resource_group_name = "rg_test"
-location            = "australiacentral"
+location            = "uksouth"
 db_location = "eastasia"
 vm_name             = "vm-test"
 environment         = "test"
