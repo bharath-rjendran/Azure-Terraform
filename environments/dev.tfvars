@@ -1,12 +1,12 @@
 resource_group_name = "rg_dev"
-location            = "australiacentral"
+location            = "northeurope"
 db_location = "canadacentral"
 vm_name             = "vm-dev"
 environment         = "dev"
 address_space       = ["10.1.0.0/16"]
 subnet_names        = ["subnet-dev"]
 subnet_cidr_blocks  = ["10.1.1.0/24"]
-vm_size             = "Standard_D4s_v3"
+vm_size             = "Standard_D2s_v3"
 admin_username      = "adminuser"
 admin_password      = "Password1234!"
 subnet_name        = "subnet-dev"
